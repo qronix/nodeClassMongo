@@ -4,10 +4,14 @@ const request = require('supertest');
 const {app} = require('./../server');
 const {Todo} = require('./../models/todo');
 
+const{ObjectID} = require('mongodb');
+
 const todos = [{
+    _id: new ObjectID(),
     text:"First test todo"
 },{
-    text:"Second test todo"
+    text:"Second test todo",
+    _id: new ObjectID()
 }];
 
 beforeEach((done)=>{
@@ -77,33 +81,61 @@ describe('GET /todos',()=>{
     });
 });
 
-describe('GET /todos:id',()=>{
-    it('Should get the test todo with correct id',(done)=>{
-        //get test todo id
-        let testTodoId = 0;
-        let text = "First test todo";
-       Todo.findOne({
-            text
-        }).then((todo)=>
-        {
-            testTodoId=todo._id;
-            if(testTodoId !== 0){
-                request(app)
-                .get(`/todos/${testTodoId}`)
-                .expect(200)
-                .expect((res)=>{
-                    expect(res.body.todo.text).toBe(text);
-                    done();
-                }).end((err)=>{
-                    if(err){
-                        return done(err);
-                    }
-                });
-            }else{
-                throw new Error('Invalid test todo id!');
-            }
-        }).catch((err)=>{
-            return done(err);
-        });
+// describe('GET /todos:id',()=>{
+//     it('Should get the test todo with correct id',(done)=>{
+//         //get test todo id
+//         let testTodoId = 0;
+//         let text = "First test todo";
+//        Todo.findOne({
+//             text
+//         }).then((todo)=>
+//         {
+//             testTodoId=todo._id;
+//             if(testTodoId !== 0){
+//                 request(app)
+//                 .get(`/todos/${testTodoId}`)
+//                 .expect(200)
+//                 .expect((res)=>{
+//                     expect(res.body.todo.text).toBe(text);
+//                     done();
+//                 }).end((err)=>{
+//                     if(err){
+//                         return done(err);
+//                     }
+//                 });
+//             }else{
+//                 throw new Error('Invalid test todo id!');
+//             }
+//         }).catch((err)=>{
+//             return done(err);
+//         });
+//     });
+// });
+
+describe('GET /todos/:id', ()=>{
+    it('Should return todo doc', (done)=>{
+        request(app)
+        .get(`/todos/${todos[0]._id.toHexString()}`)
+        .expect(200)
+        .expect((res)=>{
+            expect(res.body.todo.text).toBe(todos[0].text);
+        })
+        .end(done);
     });
+
+    it('Should return 404 if todo not found',(done)=>{
+        let hexId = new ObjectID().toHexString();
+        request(app)
+        .get(`/todos/${hexId}`)
+        .expect(404)
+        .end(done);
+    });
+
+    it('Should return 404 for non-object ids',(done)=>{
+        request(app)
+        .get(`/todos/231`)
+        .expect(404)
+        .end(done);
+    });
+    //should return 404 for non-object ids (bad id)
 });
