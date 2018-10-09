@@ -76,3 +76,34 @@ describe('GET /todos',()=>{
         .end(done);
     });
 });
+
+describe('GET /todos:id',()=>{
+    it('Should get the test todo with correct id',(done)=>{
+        //get test todo id
+        let testTodoId = 0;
+        let text = "First test todo";
+       Todo.findOne({
+            text
+        }).then((todo)=>
+        {
+            testTodoId=todo._id;
+            if(testTodoId !== 0){
+                request(app)
+                .get(`/todos/${testTodoId}`)
+                .expect(200)
+                .expect((res)=>{
+                    expect(res.body.todo.text).toBe(text);
+                    done();
+                }).end((err)=>{
+                    if(err){
+                        return done(err);
+                    }
+                });
+            }else{
+                throw new Error('Invalid test todo id!');
+            }
+        }).catch((err)=>{
+            return done(err);
+        });
+    });
+});
