@@ -8,19 +8,17 @@ const {mongoose} = require('./db/mongoose');
 const {Todo} = require('./models/todo');
 const {User} = require('./models/user');
 
+const {authenticate} = require('./middleware/authenticate');
+
 var app = express();
 
 const port = process.env.PORT;
 
 app.use(bodyParser.json());
 
-//post /users
-
-//use _.pick()
-
 app.post('/users',(req,res)=>{
     var user = new User(_.pick(req.body,["email","password"]));
-    
+
     user.save().then(()=>{
         return user.generateAuthToken();
     }).then((token)=>{
@@ -28,7 +26,11 @@ app.post('/users',(req,res)=>{
     }).catch((err)=>{
         res.status(400).send(err);
     });
+});
 
+
+app.get('/users/me',authenticate,(req,res)=>{
+    res.send(req.user);
 });
 
 app.post('/todos',(req,res)=>{
@@ -87,15 +89,6 @@ app.delete('/todos/:id',(req,res)=>{
     }).catch((err)=>{
         res.status(400).send();
     });
-
-    //validate id -> not valid = 404
-
-    //remove todo by id
-        //success
-            //if no doc, send 404 (null)
-            //if doc, send back with 200
-        //error
-            //400 with empty body
 });
 
 app.patch('/todos/:id',(req,res)=>{
