@@ -72,37 +72,6 @@ describe('GET /todos',()=>{
     });
 });
 
-// describe('GET /todos:id',()=>{
-//     it('Should get the test todo with correct id',(done)=>{
-//         //get test todo id
-//         let testTodoId = 0;
-//         let text = "First test todo";
-//        Todo.findOne({
-//             text
-//         }).then((todo)=>
-//         {
-//             testTodoId=todo._id;
-//             if(testTodoId !== 0){
-//                 request(app)
-//                 .get(`/todos/${testTodoId}`)
-//                 .expect(200)
-//                 .expect((res)=>{
-//                     expect(res.body.todo.text).toBe(text);
-//                     done();
-//                 }).end((err)=>{
-//                     if(err){
-//                         return done(err);
-//                     }
-//                 });
-//             }else{
-//                 throw new Error('Invalid test todo id!');
-//             }
-//         }).catch((err)=>{
-//             return done(err);
-//         });
-//     });
-// });
-
 describe('GET /todos/:id', ()=>{
     it('Should return todo doc', (done)=>{
         request(app)
@@ -175,22 +144,7 @@ describe('PATCH /todos/:id',()=>{
 
         let id = todos[0]._id.toHexString();
         let text = "This is the new text...bitch.";
-        // request(app)
-        // .patch(`/todos/${id}`)
-        // .send({"completed":true})
-        // .expect(200)
-        // .end((err,res)=>{
-        //     if(err){
-        //         return done(err);
-        //     }
-        //     Todo.findById(id).then((todo)=>{
-        //         expect(todo.completed).toBe(true);
-        //         expect(todo.completedAt).toBeA('number');
-        //         expect(todo.text).toBe(text);
-        //         done();
-        //     }).catch((err)=>done(err));
-        // });
-
+    
         request(app)
         .patch(`/todos/${id}`)
         .send({
@@ -210,21 +164,6 @@ describe('PATCH /todos/:id',()=>{
     it('Should clear completedAt when todo is not completed', (done)=>{
         let id = todos[1]._id.toHexString();
         let text = "This is the new text again.....bitch.";
-
-        // request(app)
-        // .patch(`/todos/${id}`)
-        // .send({"completed":false})
-        // .expect(200)
-        // .end((err,res)=>{
-        //     if(err){
-        //         return done(err);
-        //     }
-        //     Todo.findById(id).then((todo)=>{
-        //         expect(todo.completed).toBe(false);
-        //         expect(todo.completedAt).toNotExist();
-        //         done();
-        //     }).catch((err)=>done(err));
-        // });
 
         request(app)
         .patch(`/todos/${id}`)
